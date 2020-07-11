@@ -52,11 +52,10 @@ function init() {
           );
           break;
         case "View All Employees by Department":
-            inquirer.prompt({
-                
-            })
+            byDeptOrRole("department","departments","Department")
           break;
         case "View All Employees by Role":
+            byDeptOrRole("title","roles","Role")
           break;
         case "Add Employee":
           break;
@@ -96,3 +95,25 @@ function viewEmployees() {}
 
 // Initiation Function
 init();
+
+
+function byDeptOrRole(col,table,deptOrRole){
+    console.log("SELECT " + col + " FROM " + table)
+    connection.query("SELECT ?? FROM ??",[col,table],function(err,data){
+        if (err) throw err;
+        console.log(data)
+        console.log(data[1])
+        choicesArr=[]
+        for (i=0;i<data.length;i++){
+            choicesArr.push(data[i].col)
+        }
+        inquirer.prompt({
+            name:"deptRoleSelection",
+            message: "Which "+deptOrRole+" would you like to see?",
+            type: "list",
+            choices: choicesArr
+        }).then((answers)=>{
+            // answers.deptRoleSelection
+        })
+    })
+}
