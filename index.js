@@ -55,9 +55,9 @@ function init() {
                 "Remove Employee",
                 "Remove Role",
                 "Remove Department",
-                "Update Employee Name",
-                "Update Employee Role",
-                "Update Employee Department",
+                // "Update Employee Name",
+                // "Update Employee Role",
+                // "Update Employee Department",
                 "Exit",
               ],
             })
