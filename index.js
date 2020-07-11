@@ -178,16 +178,32 @@ function addItem(selection) {
           },
         ])
         .then(function (answers) {
+          let roleCount;
+          let deptCount;
           console.log(answers);
+          connection.query(
+            "SELECT role_id FROM roles WHERE title=" + answers.title,
+            function (err, data) {
+              if (err) throw err;
+              roleCount = data.role_id;
+            }
+          );
+          connection.query(
+            "SELECT department_id FROM departments WHERE department=" +
+              answers.department,
+            function (err, data) {
+              if (err) throw err;
+              deptCount = data.department_id;
+            }
+          );
+
           connection.query(
             "INSERT INTO employees(first_name, last_name, role_id, department_id) VALUES (?)",
             [
               answers.first_name,
               answers.last_name,
-              "(SELECT role_id FROM roles WHERE role=" + answers.title + ")",
-              "(SELECT department_id FROM departments WHERE department=" +
-                answers.title +
-                ")",
+              roleCount,
+              deptCount,
             ],
             function (err, data) {
               if (err) throw err;
