@@ -1,0 +1,25 @@
+{
+  "name": "Bootcamp_HW12_EmployeeTracker",
+  "version": "1.0.0",
+  "description": "https://nmitchell34.github.io/Bootcamp_HW12_EmployeeTracker/\r # Unit 12 MySQL Homework: Employee Tracker",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nmitchell34/Bootcamp_HW12_EmployeeTracker.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nmitchell34/Bootcamp_HW12_EmployeeTracker/issues"
+  },
+  "homepage": "https://github.com/nmitchell34/Bootcamp_HW12_EmployeeTracker#readme",
+  "dependencies": {
+    "console.table": "^0.10.0",
+    "inquirer": "^7.3.1",
+    "mysql": "^2.18.1"
+  }
+}
