@@ -173,7 +173,7 @@ function addItem(selection) {
           {
             type: "list",
             name: "department",
-            message: "Please input the Employee's Title",
+            message: "Please input the Employee's Department",
             choices: departmentArr,
           },
         ])
@@ -182,38 +182,82 @@ function addItem(selection) {
           let deptCount;
           console.log(answers);
           connection.query(
-            "SELECT role_id FROM roles WHERE title=" + answers.title,
+            "SELECT role_id FROM roles WHERE title='" + answers.title + "'",
             function (err, data) {
               if (err) throw err;
-              roleCount = data.role_id;
-            }
-          );
-          connection.query(
-            "SELECT department_id FROM departments WHERE department=" +
-              answers.department,
-            function (err, data) {
-              if (err) throw err;
-              deptCount = data.department_id;
-            }
-          );
-
-          connection.query(
-            "INSERT INTO employees(first_name, last_name, role_id, department_id) VALUES (?)",
-            [
-              answers.first_name,
-              answers.last_name,
-              roleCount,
-              deptCount,
-            ],
-            function (err, data) {
-              if (err) throw err;
-              console.log("Employee Added!");
-              init();
+              roleCount = parseInt(data[0].role_id);
+              //   console.log(roleCount + " Role Count")
+              connection.query(
+                "SELECT department_id FROM departments WHERE department='" +
+                  answers.department +
+                  "'",
+                function (err, data) {
+                  if (err) throw err;
+                  //   console.log(data)
+                  deptCount = parseInt(data[0].department_id);
+                  //   console.log(deptCount + " Dept Count")
+                  connection.query(
+                    "INSERT INTO employees(first_name, last_name, role_id, department_id) VALUES (?)",
+                    [
+                      answers.first_name,
+                      answers.last_name,
+                      roleCount,
+                      deptCount,
+                    ],
+                    function (err, data) {
+                      if (err) throw err;
+                      console.log("Employee Added!");
+                      init();
+                    }
+                  );
+                }
+              );
             }
           );
         });
       break;
     case "roles":
+      inquirer
+        .prompt([
+          {
+            type: "input",
+            name: "title",
+            message: "Please input the name of the Role",
+          },
+          {
+            type: "number",
+            name: "salary",
+            message: "Please input the Salary related to this position",
+          },
+          {
+            type: "list",
+            name: "department",
+            message: "What department will this role be under?",
+            choices: departmentArr,
+          },
+        ])
+        .then(function (answers) {
+          let deptCount;
+          connection.query(
+            "SELECT department_id FROM departments WHERE department='" +
+              answers.department +
+              "'",
+            function (err, data) {
+              if (err) throw err;
+              //   console.log(data)
+              deptCount = parseInt(data[0].department_id);
+              connection.query(
+                "INSERT INTO roles(title, salary, department_id) VALUES (?)",
+                [answers.title, answers.salary, deptCount],
+                function (err, data) {
+                  if (err) throw err;
+                  console.log("Role Added!");
+                  init();
+                }
+              );
+            }
+          );
+        });
       break;
     case "departments":
       break;
