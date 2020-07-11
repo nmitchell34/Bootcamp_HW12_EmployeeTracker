@@ -97,12 +97,12 @@ function init() {
                 case "Remove Department":
                   removeItem("department");
                   break;
-                case "Update Employee Name":
-                  break;
-                case "Update Employee Role":
-                  break;
-                case "Update Employee Department":
-                  break;
+                // case "Update Employee Name":
+                //   break;
+                // case "Update Employee Role":
+                //   break;
+                // case "Update Employee Department":
+                //   break;
                 case "Exit":
                   process.exit(1);
                   break;
@@ -314,13 +314,14 @@ function removeItem(selection) {
           let employeeIndex = employeeArr.indexOf(answers.employee);
           employeeId = employeeIdArr[employeeIndex];
           console.log(employeeId)
-          // connection.query(
-          //   "DELETE FROM employees WHERE employee_id=?"[employeeId],
-          //   function (err, data) {
-          //     if (err) throw err;
-          //     console.log("Employee Deleted");
-          //   }
-          // );
+          connection.query(
+            "DELETE FROM employees WHERE employee_id=?",[employeeId],
+            function (err, data) {
+              if (err) throw err;
+              console.log("Employee Deleted");
+            }
+          );
+          init()
         });
       break;
     case "roles":
