@@ -10,6 +10,8 @@ const connection = mysql.createConnection({
 });
 let rolesArr;
 let departmentArr;
+let employeeArr;
+let employeeIdArr;
 connection.connect(function (err) {
   if (err) {
     console.error("error connecting: " + err.stack);
@@ -21,91 +23,96 @@ connection.connect(function (err) {
 function init() {
   rolesArr = [];
   departmentArr = [];
-  let roleCount = [];
-  let deptCount = [];
+  employeeArr = [];
+  employeeIdArr = [];
   connection.query("SELECT department FROM departments", function (err, res) {
-    // console.log(res)
     for (i = 0; i < res.length; i++) {
-      // console.log(res[i].department)
       departmentArr.push(res[i].department);
     }
     connection.query("SELECT title FROM roles", function (err, res) {
-      // console.log(res)
       for (i = 0; i < res.length; i++) {
         rolesArr.push(res[i].title);
       }
-      inquirer
-        .prompt({
-          name: "promptStart",
-          type: "list",
-          message: "What would you like to do?",
-          choices: [
-            "View All Employees",
-            "View All Employees by Department",
-            "View All Employees by Role",
-            "Add Employee",
-            "Add Role",
-            "Add Department",
-            "Remove Employee",
-            "Remove Role",
-            "Remove Department",
-            "Update Employee Name",
-            "Update Employee Role",
-            "Update Employee Department",
-            "Exit",
-          ],
-        })
-        .then(function (answers) {
-          //   console.log(answers);
-          switch (answers.promptStart) {
-            case "View All Employees":
-              connection.query(
-                "SELECT employees.employee_id, employees.first_name, employees.last_name, departments.department, roles.title, roles.salary FROM employees INNER JOIN departments ON employees.department_id=departments.department_id INNER JOIN roles ON employees.role_id=roles.role_id",
-                function (err, data) {
-                  if (err) throw err;
-                  console.table(data);
-                  init();
-                }
-              );
-              break;
-            case "View All Employees by Department":
-              byDeptOrRole("department", "departments", "Department");
-              break;
-            case "View All Employees by Role":
-              byDeptOrRole("title", "roles", "Role");
-              break;
-            case "Add Employee":
-              addItem("employees");
-              break;
-            case "Add Role":
-              addItem("roles");
-              break;
-            case "Add Department":
-              addItem("departments");
-              break;
-            case "Remove Employee":
-              removeItem("employees");
-              break;
-            case "Remove Role":
-              removeItem("roles");
-              break;
-            case "Remove Department":
-              removeItem("department");
-              break;
-            case "Update Employee Name":
-              break;
-            case "Update Employee Role":
-              break;
-            case "Update Employee Department":
-              break;
-            case "Exit":
-              process.exit(1);
-              break;
+      connection.query(
+        "SELECT employee_id, first_name, last_name FROM employees",
+        function (err, res) {
+          for (i = 0; i < res.length; i++) {
+            employeeIdArr.push(res[i].employee_id);
+            employeeArr.push(res[i].first_name + " " + res[i].last_name);
           }
-        })
-        .catch((err) => {
-          if (err) throw err;
-        });
+          inquirer
+            .prompt({
+              name: "promptStart",
+              type: "list",
+              message: "What would you like to do?",
+              choices: [
+                "View All Employees",
+                "View All Employees by Department",
+                "View All Employees by Role",
+                "Add Employee",
+                "Add Role",
+                "Add Department",
+                "Remove Employee",
+                "Remove Role",
+                "Remove Department",
+                "Update Employee Name",
+                "Update Employee Role",
+                "Update Employee Department",
+                "Exit",
+              ],
+            })
+            .then(function (answers) {
+              switch (answers.promptStart) {
+                case "View All Employees":
+                  connection.query(
+                    "SELECT employees.employee_id, employees.first_name, employees.last_name, departments.department, roles.title, roles.salary FROM employees INNER JOIN departments ON employees.department_id=departments.department_id INNER JOIN roles ON employees.role_id=roles.role_id",
+                    function (err, data) {
+                      if (err) throw err;
+                      console.table(data);
+                      init();
+                    }
+                  );
+                  break;
+                case "View All Employees by Department":
+                  byDeptOrRole("department", "departments", "Department");
+                  break;
+                case "View All Employees by Role":
+                  byDeptOrRole("title", "roles", "Role");
+                  break;
+                case "Add Employee":
+                  addItem("employees");
+                  break;
+                case "Add Role":
+                  addItem("roles");
+                  break;
+                case "Add Department":
+                  addItem("departments");
+                  break;
+                case "Remove Employee":
+                  removeItem("employees");
+                  break;
+                case "Remove Role":
+                  removeItem("roles");
+                  break;
+                case "Remove Department":
+                  removeItem("department");
+                  break;
+                case "Update Employee Name":
+                  break;
+                case "Update Employee Role":
+                  break;
+                case "Update Employee Department":
+                  break;
+                case "Exit":
+                  process.exit(1);
+                  break;
+              }
+            })
+            .catch((err) => {
+              if (err) throw err;
+            });
+        }
+      );
     });
   });
 }
@@ -293,16 +300,29 @@ function addItem(selection) {
 
 function removeItem(selection) {
   switch (selection) {
-    // case "employees":
-    //   inquirer.prompt([
-    //     {
-    //       type: "list",
-    //       name: "title",
-    //       message: "What employee would you like to remove?",
-    //       choices: rolesArr,
-    //     },
-    //   ]).then;
-    //   break;
+    case "employees":
+      inquirer
+        .prompt([
+          {
+            type: "list",
+            name: "employee",
+            message: "What employee would you like to remove?",
+            choices: employeeArr,
+          },
+        ])
+        .then((answers) => {
+          let employeeIndex = employeeArr.indexOf(answers.employee);
+          employeeId = employeeIdArr[employeeIndex];
+          console.log(employeeId)
+          // connection.query(
+          //   "DELETE FROM employees WHERE employee_id=?"[employeeId],
+          //   function (err, data) {
+          //     if (err) throw err;
+          //     console.log("Employee Deleted");
+          //   }
+          // );
+        });
+      break;
     case "roles":
       inquirer
         .prompt([
@@ -315,15 +335,17 @@ function removeItem(selection) {
         ])
         .then(function (answers) {
           connection.query(
-            "DELETE roles WHERE title='" + answers.title + "'",
+            "DELETE FROM roles WHERE title=?",
+            [answers.title],
             (err, res) => {
               if (err) throw err;
               console.log("Role has been deleted");
+              init()
             }
           );
         });
       break;
-    case "departments":
+    case "department":
       inquirer
         .prompt([
           {
@@ -335,10 +357,19 @@ function removeItem(selection) {
         ])
         .then(function (answers) {
           connection.query(
-            "DELETE departments WHERE department='" + answers.department + "'",
+            "SELECT department_id FROM departments WHERE department=?",
+            [answers.department],
             (err, res) => {
               if (err) throw err;
-              console.log("Department has been deleted");
+              connection.query(
+                "DELETE FROM departments WHERE department_id=?",
+                [res.department_id],
+                function (err, res) {
+                  if (err) throw err;
+                  console.log("Database Deleted!");
+                  init()
+                }
+              );
             }
           );
         });
