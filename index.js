@@ -9,6 +9,8 @@ const connection = mysql.createConnection({
   password: "NM97c13ab0!",
   database: "cms_db",
 });
+let rolesArr = [];
+let departmentArr = [];
 
 connection.connect(function (err) {
   if (err) {
@@ -18,6 +20,19 @@ connection.connect(function (err) {
   console.log("connected as id " + connection.threadId);
 });
 function init() {
+  connection.query("SELECT department FROM departments", function (err, res) {
+    // console.log(res)
+    for (i = 0; i < res.length; i++) {
+      // console.log(res[i].department)
+      departmentArr.push(res[i].department);
+    }
+  });
+  connection.query("SELECT title FROM roles", function (err, res) {
+    // console.log(res)
+    for (i = 0; i < res.length; i++) {
+      rolesArr.push(res[i].title);
+    }
+  });
   inquirer
     .prompt({
       name: "promptStart",
@@ -58,10 +73,13 @@ function init() {
           byDeptOrRole("title", "roles", "Role");
           break;
         case "Add Employee":
+          addItem("employees");
           break;
         case "Add Role":
+          addItem("roles");
           break;
         case "Add Department":
+          addItem("departments");
           break;
         case "Remove Employee":
           break;
@@ -82,7 +100,7 @@ function init() {
     });
 }
 
-function viewEmployees() {}
+// function viewEmployees() {}
 
 // Queries List
 // connection.query(
@@ -97,7 +115,6 @@ function viewEmployees() {}
 init();
 
 function byDeptOrRole(col, table, deptOrRole) {
-  console.log("SELECT " + col + " FROM " + table);
   connection.query("SELECT ?? FROM ??", [col, table], function (err, data) {
     if (err) throw err;
     choicesArr = [];
@@ -130,4 +147,59 @@ function byDeptOrRole(col, table, deptOrRole) {
         // answers.deptRoleSelection
       });
   });
+}
+
+function addItem(selection) {
+  switch (selection) {
+    case "employees":
+      inquirer
+        .prompt([
+          {
+            type: "input",
+            name: "first_name",
+            message: "Please input the Employee's First Name",
+          },
+          {
+            type: "input",
+            name: "last_name",
+            message: "Please input the Employee's Last Name",
+          },
+          {
+            type: "list",
+            name: "title",
+            message: "Please input the Employee's Title",
+            choices: rolesArr,
+          },
+          {
+            type: "list",
+            name: "department",
+            message: "Please input the Employee's Title",
+            choices: departmentArr,
+          },
+        ])
+        .then(function (answers) {
+          console.log(answers);
+          connection.query(
+            "INSERT INTO employees(first_name, last_name, role_id, department_id) VALUES (?)",
+            [
+              answers.first_name,
+              answers.last_name,
+              "(SELECT role_id FROM roles WHERE role=" + answers.title + ")",
+              "(SELECT department_id FROM departments WHERE department=" +
+                answers.title +
+                ")",
+            ],
+            function (err, data) {
+              if (err) throw err;
+              console.log("Employee Added!");
+              init();
+            }
+          );
+        });
+      break;
+    case "roles":
+      break;
+    case "departments":
+      break;
+  }
 }
