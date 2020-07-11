@@ -313,7 +313,7 @@ function removeItem(selection) {
         .then((answers) => {
           let employeeIndex = employeeArr.indexOf(answers.employee);
           employeeId = employeeIdArr[employeeIndex];
-          console.log(employeeId)
+          // console.log(employeeId)
           connection.query(
             "DELETE FROM employees WHERE employee_id=?",[employeeId],
             function (err, data) {
