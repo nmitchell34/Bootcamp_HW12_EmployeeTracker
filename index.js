@@ -1,7 +1,6 @@
 const inquirer = require("inquirer");
 const mysql = require("mysql");
 const cTable = require("console.table");
-var orm = require("./orm.js");
 const connection = mysql.createConnection({
   host: "localhost",
   port: 3306,
@@ -9,8 +8,8 @@ const connection = mysql.createConnection({
   password: "NM97c13ab0!",
   database: "cms_db",
 });
-let rolesArr
-let departmentArr
+let rolesArr;
+let departmentArr;
 connection.connect(function (err) {
   if (err) {
     console.error("error connecting: " + err.stack);
@@ -57,7 +56,7 @@ function init() {
           ],
         })
         .then(function (answers) {
-        //   console.log(answers);
+          //   console.log(answers);
           switch (answers.promptStart) {
             case "View All Employees":
               connection.query(
@@ -85,10 +84,13 @@ function init() {
               addItem("departments");
               break;
             case "Remove Employee":
+              removeItem("employees");
               break;
             case "Remove Role":
+              removeItem("roles");
               break;
             case "Remove Department":
+              removeItem("department");
               break;
             case "Update Employee Name":
               break;
@@ -282,6 +284,61 @@ function addItem(selection) {
               if (err) throw err;
               console.log("Department Added!");
               init();
+            }
+          );
+        });
+      break;
+  }
+}
+
+function removeItem(selection) {
+  switch (selection) {
+    // case "employees":
+    //   inquirer.prompt([
+    //     {
+    //       type: "list",
+    //       name: "title",
+    //       message: "What employee would you like to remove?",
+    //       choices: rolesArr,
+    //     },
+    //   ]).then;
+    //   break;
+    case "roles":
+      inquirer
+        .prompt([
+          {
+            type: "list",
+            name: "title",
+            message: "What role would you like to remove?",
+            choices: rolesArr,
+          },
+        ])
+        .then(function (answers) {
+          connection.query(
+            "DELETE roles WHERE title='" + answers.title + "'",
+            (err, res) => {
+              if (err) throw err;
+              console.log("Role has been deleted");
+            }
+          );
+        });
+      break;
+    case "departments":
+      inquirer
+        .prompt([
+          {
+            type: "list",
+            name: "department",
+            message: "Which department would you like to remove?",
+            choices: departmentArr,
+          },
+        ])
+        .then(function (answers) {
+          connection.query(
+            "DELETE departments WHERE department='" + answers.department + "'",
+            (err, res) => {
+              if (err) throw err;
+              console.log("Department has been deleted");
             }
           );
         });
