@@ -9,9 +9,8 @@ const connection = mysql.createConnection({
   password: "NM97c13ab0!",
   database: "cms_db",
 });
-let rolesArr = [];
-let departmentArr = [];
-
+let rolesArr
+let departmentArr
 connection.connect(function (err) {
   if (err) {
     console.error("error connecting: " + err.stack);
@@ -19,91 +18,94 @@ connection.connect(function (err) {
   }
   console.log("connected as id " + connection.threadId);
 });
+
 function init() {
-  let roleCount;
-  let deptCount;
+  rolesArr = [];
+  departmentArr = [];
+  let roleCount = [];
+  let deptCount = [];
   connection.query("SELECT department FROM departments", function (err, res) {
     // console.log(res)
     for (i = 0; i < res.length; i++) {
       // console.log(res[i].department)
       departmentArr.push(res[i].department);
     }
-  });
-  connection.query("SELECT title FROM roles", function (err, res) {
-    // console.log(res)
-    for (i = 0; i < res.length; i++) {
-      rolesArr.push(res[i].title);
-    }
-  });
-  inquirer
-    .prompt({
-      name: "promptStart",
-      type: "list",
-      message: "What would you like to do?",
-      choices: [
-        "View All Employees",
-        "View All Employees by Department",
-        "View All Employees by Role",
-        "Add Employee",
-        "Add Role",
-        "Add Department",
-        "Remove Employee",
-        "Remove Role",
-        "Remove Department",
-        "Update Employee Name",
-        "Update Employee Role",
-        "Update Employee Department",
-        "Exit",
-      ],
-    })
-    .then(function (answers) {
-      console.log(answers);
-      switch (answers.promptStart) {
-        case "View All Employees":
-          connection.query(
-            "SELECT employees.employee_id, employees.first_name, employees.last_name, departments.department, roles.title, roles.salary FROM employees INNER JOIN departments ON employees.department_id=departments.department_id INNER JOIN roles ON employees.role_id=roles.role_id",
-            function (err, data) {
-              if (err) throw err;
-              console.table(data);
-              init();
-            }
-          );
-          break;
-        case "View All Employees by Department":
-          byDeptOrRole("department", "departments", "Department");
-          break;
-        case "View All Employees by Role":
-          byDeptOrRole("title", "roles", "Role");
-          break;
-        case "Add Employee":
-          addItem("employees");
-          break;
-        case "Add Role":
-          addItem("roles");
-          break;
-        case "Add Department":
-          addItem("departments");
-          break;
-        case "Remove Employee":
-          break;
-        case "Remove Role":
-          break;
-        case "Remove Department":
-          break;
-        case "Update Employee Name":
-          break;
-        case "Update Employee Role":
-          break;
-        case "Update Employee Department":
-          break;
-        case "Exit":
-          process.exit(1);
-          break;
+    connection.query("SELECT title FROM roles", function (err, res) {
+      // console.log(res)
+      for (i = 0; i < res.length; i++) {
+        rolesArr.push(res[i].title);
       }
-    })
-    .catch((err) => {
-      if (err) throw err;
+      inquirer
+        .prompt({
+          name: "promptStart",
+          type: "list",
+          message: "What would you like to do?",
+          choices: [
+            "View All Employees",
+            "View All Employees by Department",
+            "View All Employees by Role",
+            "Add Employee",
+            "Add Role",
+            "Add Department",
+            "Remove Employee",
+            "Remove Role",
+            "Remove Department",
+            "Update Employee Name",
+            "Update Employee Role",
+            "Update Employee Department",
+            "Exit",
+          ],
+        })
+        .then(function (answers) {
+        //   console.log(answers);
+          switch (answers.promptStart) {
+            case "View All Employees":
+              connection.query(
+                "SELECT employees.employee_id, employees.first_name, employees.last_name, departments.department, roles.title, roles.salary FROM employees INNER JOIN departments ON employees.department_id=departments.department_id INNER JOIN roles ON employees.role_id=roles.role_id",
+                function (err, data) {
+                  if (err) throw err;
+                  console.table(data);
+                  init();
+                }
+              );
+              break;
+            case "View All Employees by Department":
+              byDeptOrRole("department", "departments", "Department");
+              break;
+            case "View All Employees by Role":
+              byDeptOrRole("title", "roles", "Role");
+              break;
+            case "Add Employee":
+              addItem("employees");
+              break;
+            case "Add Role":
+              addItem("roles");
+              break;
+            case "Add Department":
+              addItem("departments");
+              break;
+            case "Remove Employee":
+              break;
+            case "Remove Role":
+              break;
+            case "Remove Department":
+              break;
+            case "Update Employee Name":
+              break;
+            case "Update Employee Role":
+              break;
+            case "Update Employee Department":
+              break;
+            case "Exit":
+              process.exit(1);
+              break;
+          }
+        })
+        .catch((err) => {
+          if (err) throw err;
+        });
     });
+  });
 }
 
 // function viewEmployees() {}
@@ -184,7 +186,7 @@ function addItem(selection) {
           },
         ])
         .then(function (answers) {
-          console.log(answers);
+          //   console.log(answers);
           connection.query(
             "SELECT role_id FROM roles WHERE title='" + answers.title + "'",
             function (err, data) {
