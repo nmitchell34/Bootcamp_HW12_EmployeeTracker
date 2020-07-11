@@ -20,6 +20,8 @@ connection.connect(function (err) {
   console.log("connected as id " + connection.threadId);
 });
 function init() {
+  let roleCount;
+  let deptCount;
   connection.query("SELECT department FROM departments", function (err, res) {
     // console.log(res)
     for (i = 0; i < res.length; i++) {
@@ -51,6 +53,7 @@ function init() {
         "Update Employee Name",
         "Update Employee Role",
         "Update Employee Department",
+        "Exit",
       ],
     })
     .then(function (answers) {
@@ -92,6 +95,9 @@ function init() {
         case "Update Employee Role":
           break;
         case "Update Employee Department":
+          break;
+        case "Exit":
+          process.exit(1);
           break;
       }
     })
@@ -178,8 +184,6 @@ function addItem(selection) {
           },
         ])
         .then(function (answers) {
-          let roleCount;
-          let deptCount;
           console.log(answers);
           connection.query(
             "SELECT role_id FROM roles WHERE title='" + answers.title + "'",
@@ -197,7 +201,7 @@ function addItem(selection) {
                   deptCount = parseInt(data[0].department_id);
                   //   console.log(deptCount + " Dept Count")
                   connection.query(
-                    "INSERT INTO employees(first_name, last_name, role_id, department_id) VALUES (?)",
+                    "INSERT INTO employees(first_name, last_name, role_id, department_id) VALUES (?,?,?,?)",
                     [
                       answers.first_name,
                       answers.last_name,
@@ -247,7 +251,7 @@ function addItem(selection) {
               //   console.log(data)
               deptCount = parseInt(data[0].department_id);
               connection.query(
-                "INSERT INTO roles(title, salary, department_id) VALUES (?)",
+                "INSERT INTO roles(title, salary, department_id) VALUES (?,?,?)",
                 [answers.title, answers.salary, deptCount],
                 function (err, data) {
                   if (err) throw err;
@@ -260,6 +264,25 @@ function addItem(selection) {
         });
       break;
     case "departments":
+      inquirer
+        .prompt([
+          {
+            type: "input",
+            name: "department",
+            message: "Please input the name of the Department",
+          },
+        ])
+        .then(function (answers) {
+          connection.query(
+            "INSERT INTO departments (department) VALUES (?)",
+            [answers.department],
+            function (err, res) {
+              if (err) throw err;
+              console.log("Department Added!");
+              init();
+            }
+          );
+        });
       break;
   }
 }
